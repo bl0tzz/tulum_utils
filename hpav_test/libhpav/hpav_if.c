@@ -168,6 +168,7 @@ int hpav_populate_mac_addr(hpav_if_t **interfaces_list) {
 int hpav_get_interfaces(hpav_if_t **interface_list,
                         struct hpav_error **error_stack) {
     // Local variables declaration
+    pcap_if_t *pcap_interfaces_current = NULL;
     pcap_if_t *pcap_interfaces = NULL;
     char errbuf[PCAP_ERRBUF_SIZE];
     hpav_if_t *prev_if = NULL;
@@ -181,6 +182,7 @@ int hpav_get_interfaces(hpav_if_t **interface_list,
 
     // Calls libpcap
     result = pcap_findalldevs(&pcap_interfaces, errbuf);
+    pcap_interfaces_current = pcap_interfaces;
     if (result != 0) {
         char buffer[PCAP_ERRBUF_SIZE + 128];
         sprintf(buffer, "PCAP error code : %d, errbuf : %s", result, errbuf);
@@ -191,30 +193,30 @@ int hpav_get_interfaces(hpav_if_t **interface_list,
     }
 
     // Copy data from libpcap into hpav data structures
-    while (pcap_interfaces != NULL) {
+    while (pcap_interfaces_current != NULL) {
 #ifdef __linux__
-        if ((strcmp("any", pcap_interfaces->name) != 0) &&
-            (strncmp("nflog", pcap_interfaces->name, 5) != 0) &&
-            (strncmp("usbmon", pcap_interfaces->name, 6) != 0) &&
-            (pcap_interfaces->flags != PCAP_IF_LOOPBACK)) {
+        if ((strcmp("any", pcap_interfaces_current->name) != 0) &&
+            (strncmp("nflog", pcap_interfaces_current->name, 5) != 0) &&
+            (strncmp("usbmon", pcap_interfaces_current->name, 6) != 0) &&
+            (pcap_interfaces_current->flags != PCAP_IF_LOOPBACK)) {
 #else
         // On Windows, skip generic dialup interface. Winpcap cannot sendpacket
         // to this interface
         if (strcmp("\\Device\\NPF_GenericDialupAdapter",
-                   pcap_interfaces->name) != 0) {
+                   pcap_interfaces_current->name) != 0) {
 #endif
             // New hpav_if
             new_if = malloc(sizeof(hpav_if_t));
             // Initialise interface MAC address
             memset(new_if->mac_addr, 0, ETH_MAC_ADDRESS_SIZE);
             // Copy interface name
-            new_if->name = malloc(strlen(pcap_interfaces->name) + 1);
-            strcpy(new_if->name, pcap_interfaces->name);
+            new_if->name = malloc(strlen(pcap_interfaces_current->name) + 1);
+            strcpy(new_if->name, pcap_interfaces_current->name);
             // Copy interface description (can be NULL)
-            if (pcap_interfaces->description != NULL) {
+            if (pcap_interfaces_current->description != NULL) {
                 new_if->description =
-                    malloc(strlen(pcap_interfaces->description) + 1);
-                strcpy(new_if->description, pcap_interfaces->description);
+                    malloc(strlen(pcap_interfaces_current->description) + 1);
+                strcpy(new_if->description, pcap_interfaces_current->description);
             } else {
                 new_if->description = NULL;
             }
@@ -244,7 +246,7 @@ int hpav_get_interfaces(hpav_if_t **interface_list,
                 prev_if->next = new_if;
             }
         }
-        pcap_interfaces = pcap_interfaces->next;
+        pcap_interfaces_current = pcap_interfaces_current->next;
     }
 
     // We don't need pcap interfaces anymore : free them

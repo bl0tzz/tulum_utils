@@ -580,6 +580,7 @@ int hpav_mtk_vs_reset_ind_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_compile failed", buffer);
+        hpav_free_eth_frames(tx_frames);
         return HPAV_ERROR_PCAP_ERROR;
     }
 
@@ -591,8 +592,11 @@ int hpav_mtk_vs_reset_ind_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_setfilter failed", buffer);
+        hpav_free_eth_frames(tx_frames);
+        pcap_freecode(&fp);
         return HPAV_ERROR_PCAP_ERROR;
     }
+    pcap_freecode(&fp);
 
     /* Send the frames */
     current_frame = tx_frames;
@@ -716,6 +720,7 @@ int hpav_mtk_vs_get_pwm_stats_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_compile failed", buffer);
+        hpav_free_eth_frames(tx_frames);
         return HPAV_ERROR_PCAP_ERROR;
     }
 
@@ -727,8 +732,11 @@ int hpav_mtk_vs_get_pwm_stats_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_setfilter failed", buffer);
+        hpav_free_eth_frames(tx_frames);
+        pcap_freecode(&fp);
         return HPAV_ERROR_PCAP_ERROR;
     }
+    pcap_freecode(&fp);
 
     /* Send the frames */
     current_frame = tx_frames;
@@ -854,9 +862,10 @@ int hpav_mtk_vs_get_pwm_conf_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_compile failed", buffer);
+        hpav_free_eth_frames(tx_frames);
         return HPAV_ERROR_PCAP_ERROR;
     }
-
+    
     /* Set the compiled program as the filter */
     if (pcap_setfilter(channel->pcap_chan, &fp) == -1) {
         char buffer[PCAP_ERRBUF_SIZE + 128];
@@ -865,8 +874,11 @@ int hpav_mtk_vs_get_pwm_conf_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_setfilter failed", buffer);
+        hpav_free_eth_frames(tx_frames);
+        pcap_freecode(&fp);
         return HPAV_ERROR_PCAP_ERROR;
     }
+    pcap_freecode(&fp);
 
     /* Send the frames */
     current_frame = tx_frames;
@@ -992,6 +1004,7 @@ int hpav_mtk_vs_set_pwm_conf_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_compile failed", buffer);
+        hpav_free_eth_frames(tx_frames);
         return HPAV_ERROR_PCAP_ERROR;
     }
 
@@ -1003,8 +1016,11 @@ int hpav_mtk_vs_set_pwm_conf_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_setfilter failed", buffer);
+        hpav_free_eth_frames(tx_frames);
+        pcap_freecode(&fp);
         return HPAV_ERROR_PCAP_ERROR;
     }
+    pcap_freecode(&fp);
 
     /* Send the frames */
     current_frame = tx_frames;
@@ -1129,6 +1145,7 @@ int hpav_mtk_vs_set_tx_cali_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_compile failed", buffer);
+        hpav_free_eth_frames(tx_frames);
         return HPAV_ERROR_PCAP_ERROR;
     }
 
@@ -1140,8 +1157,11 @@ int hpav_mtk_vs_set_tx_cali_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_setfilter failed", buffer);
+        hpav_free_eth_frames(tx_frames);
+        pcap_freecode(&fp);
         return HPAV_ERROR_PCAP_ERROR;
     }
+    pcap_freecode(&fp);
 
     /* Send the frames */
     current_frame = tx_frames;
@@ -1263,8 +1283,10 @@ int hpav_mtk_vs_set_tx_cali_ind_rcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_setfilter failed", buffer);
+        pcap_freecode(&fp);
         return HPAV_ERROR_PCAP_ERROR;
     }
+    pcap_freecode(&fp);
 
     /* Receive the frames. If timeout is zero, don't attempt reception. */
     if (timeout_ms > 0) {
@@ -1370,6 +1392,7 @@ int hpav_mtk_vs_file_access_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_compile failed", buffer);
+        hpav_free_eth_frames(tx_frames);
         return HPAV_ERROR_PCAP_ERROR;
     }
 
@@ -1381,8 +1404,11 @@ int hpav_mtk_vs_file_access_sndrcv(
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_setfilter failed", buffer);
+        hpav_free_eth_frames(tx_frames);
+        pcap_freecode(&fp);
         return HPAV_ERROR_PCAP_ERROR;
     }
+    pcap_freecode(&fp);
 
     /* Send the frames */
     current_frame = tx_frames;
@@ -1520,6 +1546,6 @@ int hpav_send_raw_mtk_mme(struct hpav_chan *channel,
         }
         current_frame = current_frame->next;
     }
-
+    hpav_free_eth_frames(tx_frames);
     return result;
 }

@@ -277,6 +277,7 @@ static inline void rx_callback(u_char *user,
             hpav_add_error(error_stack, hpav_error_category_network,           \
                            hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,      \
                            "pcap_compile failed", buffer);                     \
+            hpav_free_eth_frames(tx_frames);                                   \
             return HPAV_ERROR_PCAP_ERROR;                                      \
         }                                                                      \
                                                                                \
@@ -288,8 +289,11 @@ static inline void rx_callback(u_char *user,
             hpav_add_error(error_stack, hpav_error_category_network,           \
                            hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,      \
                            "pcap_setfilter failed", buffer);                   \
+            hpav_free_eth_frames(tx_frames);                                   \
+            pcap_freecode(&fp);                                                \
             return HPAV_ERROR_PCAP_ERROR;                                      \
         }                                                                      \
+        pcap_freecode(&fp);                                                    \
                                                                                \
         /* Send the frames */                                                  \
         current_frame = tx_frames;                                             \

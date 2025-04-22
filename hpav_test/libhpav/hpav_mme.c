@@ -800,7 +800,8 @@ int hpav_cm_set_key_encrypted_sndrcv(
 
     /* Build a CM_ENCRYPTED_PAYLOAD.IND message with the encrypted data */
     tx_encrypted_mme = hpav_encrypt_with_dak(tx_frames, device_password);
-
+    hpav_free_eth_frames(tx_frames);
+    
     /* Send/receive the encrypted mme */
     /* In theory there should not be any fragmentation for this type of
      * encrypted MME */
@@ -883,11 +884,12 @@ int hpav_send_raw_mme(struct hpav_chan *channel,
             hpav_add_error(error_stack, hpav_error_category_network,
                            hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                            "pcap_sendpacket failed", buffer);
+            hpav_free_eth_frames(tx_frames);
             return HPAV_ERROR_PCAP_ERROR;
         }
         current_frame = current_frame->next;
     }
-
+    hpav_free_eth_frames(tx_frames);
     return HPAV_OK;
 }
 
@@ -924,8 +926,10 @@ int hpav_sniff(struct hpav_chan *channel, hpav_sniff_callback callback,
         hpav_add_error(error_stack, hpav_error_category_network,
                        hpav_error_module_core, HPAV_ERROR_PCAP_ERROR,
                        "pcap_setfilter failed", buffer);
+        pcap_freecode(&fp);
         return HPAV_ERROR_PCAP_ERROR;
     }
+    pcap_freecode(&fp);
 
     do {
         result = pcap_dispatch(channel->pcap_chan, -1, rx_callback,
