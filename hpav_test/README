@@ -243,7 +243,7 @@ Supported MMEs
 
   mtk_vs_file_access_req  if_num [mac_address] [bootloader input BOOTLOADER] [simage SIMAGE input SIMAGE] [simage-delete SIMAGE_DELETE]
                                  [write WRITE input WRITE] [read READ] [debug] [save READ output OUTPUT] [delete DELETE]
-                                 [listdir DIR] [format] [all] [scan-sta]
+                                 [listdir DIR] [format] [all] [scan-sta] [read-bootloader output OUTPUT]
 
   vc_vs_set_sniffer_conf_req if_num sta_mac_address mode
     sta_mac_address : MAC address of the destination STA

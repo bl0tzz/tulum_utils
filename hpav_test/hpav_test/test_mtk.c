@@ -2240,6 +2240,9 @@ mtk_vs_file_access_command_t mtk_vs_file_access_commands[] = {
     {"scan-sta", HPAV_MTK_VS_FILE_ACCESS_REQ_OP_SCAN_STA,
      HPAV_MTK_VS_FILE_ACCESS_REQ_FILE_TYPE_GENERAL_FILE, PARSE_NEXT_NO,
      FILE_FLAG_NONE},
+    {"read-bootloader", HPAV_MTK_VS_FILE_ACCESS_REQ_OP_READ,
+     HPAV_MTK_VS_FILE_ACCESS_REQ_FILE_TYPE_BOOTLOADER, PARSE_NEXT_NO,
+     FILE_FLAG_OUTPUT},
     {"", HPAV_MTK_VS_FILE_ACCESS_REQ_OP_MAX},
 };
 
@@ -2295,7 +2298,17 @@ process_mtk_vs_file_access_cnf(mtk_vs_file_access_command_t *command,
     while (response != NULL &&
            result == HPAV_MTK_VS_FILE_ACCESS_CNF_MSTATUS_SUCCESS) {
         if (response->mstatus == HPAV_MTK_VS_FILE_ACCESS_CNF_MSTATUS_SUCCESS) {
-            if (response->op == HPAV_MTK_VS_FILE_ACCESS_REQ_OP_READ ||
+            if (response->op == HPAV_MTK_VS_FILE_ACCESS_REQ_OP_READ &&
+                command->file_flag == FILE_FLAG_OUTPUT) {
+                if (0 == response->fragment_number)
+                    fp = fopen(command->file_name, "wb");
+                else
+                    fp = fopen(command->file_name, "a+b");
+                if (fp) {
+                    fwrite(response->data, 1, response->length, fp);
+                    fclose(fp);
+                }
+            } else if (response->op == HPAV_MTK_VS_FILE_ACCESS_REQ_OP_READ ||
                 response->op == HPAV_MTK_VS_FILE_ACCESS_REQ_OP_LIST_DIR) {
                 buf = (char *)malloc(response->length + 1);
                 memcpy(buf, response->data, response->length);
@@ -2483,7 +2496,8 @@ int test_mme_mtk_vs_file_access_req(hpav_chan_t *channel, int argc,
             "[simage SIMAGE input SIMAGE] [simage-delete SIMAGE_DELETE]\n"
             "[write WRITE input WRITE] [read READ] [debug]\n"
             "[save READ output OUTPUT] [delete DELETE]\n"
-            "[listdir DIR] [format] [all] [scan-sta]\n");
+            "[listdir DIR] [format] [all] [scan-sta]\n"
+            "[read-bootloader output OUTPUT]\n");
         return EXIT_USAGE;
     }
 
