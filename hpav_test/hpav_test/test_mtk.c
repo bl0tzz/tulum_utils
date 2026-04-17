@@ -2243,6 +2243,9 @@ mtk_vs_file_access_command_t mtk_vs_file_access_commands[] = {
     {"read-bootloader", HPAV_MTK_VS_FILE_ACCESS_REQ_OP_READ,
      HPAV_MTK_VS_FILE_ACCESS_REQ_FILE_TYPE_BOOTLOADER, PARSE_NEXT_NO,
      FILE_FLAG_OUTPUT},
+    {"save-bootloader", HPAV_MTK_VS_FILE_ACCESS_REQ_OP_SAVE,
+     HPAV_MTK_VS_FILE_ACCESS_REQ_FILE_TYPE_BOOTLOADER, PARSE_NEXT_NO,
+     FILE_FLAG_OUTPUT},
     {"", HPAV_MTK_VS_FILE_ACCESS_REQ_OP_MAX},
 };
 
@@ -2497,7 +2500,7 @@ int test_mme_mtk_vs_file_access_req(hpav_chan_t *channel, int argc,
             "[write WRITE input WRITE] [read READ] [debug]\n"
             "[save READ output OUTPUT] [delete DELETE]\n"
             "[listdir DIR] [format] [all] [scan-sta]\n"
-            "[read-bootloader output OUTPUT]\n");
+            "[read-bootloader output OUTPUT] [save-bootloader output OUTPUT]\n");
         return EXIT_USAGE;
     }
 
